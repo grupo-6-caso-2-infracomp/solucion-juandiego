@@ -11,8 +11,8 @@ public class App {
         System.out.println("Number of TLB entries");
         Integer nTLB = scanner.nextInt();
 
-        System.out.println("Number of pages in RAM"); //marco de pagina
-        Integer nMP = scanner.nextInt();
+        System.out.println("Number of page frames in RAM");
+        Integer nPF = scanner.nextInt();
 
         Scanner scanner2 = new Scanner(System.in);
         System.out.println("Name of the references file");
@@ -23,9 +23,9 @@ public class App {
 
         TLB tlb = new TLB(nTLB);
 
-        RAM ram = new RAM();
+        RAM ram = new RAM(nPF);
 
-        PageTable pageTable = new PageTable();
+        PageTable pageTable = new PageTable(nPF);
 
         File file = new File(fileName);
         try {
