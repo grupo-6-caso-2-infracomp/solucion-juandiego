@@ -1,34 +1,37 @@
 import java.util.ArrayList;
-import java.util.BitSet;
 
 public class PageTable {
 
-    private static ArrayList<Integer> map = new ArrayList<>(64); // where to find each page in RAM. If its not present, returns -1
-    private static ArrayList<Integer> references = new ArrayList<>(64);
+    private static final ArrayList<Integer> pageTableList = new ArrayList<>(64); // where to find each page in RAM. If not present, returns -1
+    private static final ArrayList<Integer> rBits = new ArrayList<>(64);
 
     //aging algorithm should modify here, it's for solving page faults
     public PageTable(int pageFrames) {
         for (int i = 0; i < 64; i++) {
-            references.add(0);
+            rBits.add(0);
             if (i <= pageFrames){
-                map.add(i);
+                pageTableList.add(i);
             }
             else {
-                map.add(-2);
+                pageTableList.add(-1); // page fault
             }
         }
     }
 
-    public synchronized Integer getFromMap(int index){
-        return map.get(index);
+    public synchronized Integer getFromPageTableList(int index){
+        return pageTableList.get(index);
     }
 
-    public synchronized void putOnMap(int index, int newReference){
-        map.set(index, newReference);
+    public synchronized void updatePageTableListItem(int index, int newReference){
+        pageTableList.set(index, newReference);
     }
 
-    public synchronized void updateReference(int index){
-        Integer i = map.get(index);
-        i += 0b10000000;
+    public synchronized void shiftRBits(){
+        rBits.replaceAll(integer -> integer >> 1);
     }
+
+    public synchronized void updateRBit(int index){
+        rBits.set(index, rBits.get(index)+0b10000000);
+    }
+
 }

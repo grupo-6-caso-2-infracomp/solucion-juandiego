@@ -32,7 +32,8 @@ public class App {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String s;
             while ((s=br.readLine())!= null){
-                // the program executes
+                int tag = Integer.parseInt(s);
+                ReferenceUpdate r = new ReferenceUpdate();
             }
         } catch (IOException e) {
             e.printStackTrace();

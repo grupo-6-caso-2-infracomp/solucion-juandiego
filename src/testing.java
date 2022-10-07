@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.BitSet;
 
 public class testing {
     public static void main(String[] args) {
@@ -10,6 +9,9 @@ public class testing {
         System.out.println(num);
 
         ArrayList<Integer> references = new ArrayList<>(64);
+        references.add(0b10000000);
+        references.add(0b01000000);
+        references.replaceAll(integer -> integer >> 1);
         System.out.println(references.toString());
 
     }
