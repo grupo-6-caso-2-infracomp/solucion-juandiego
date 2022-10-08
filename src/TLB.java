@@ -11,14 +11,14 @@ public class TLB {
         this.n = n;
     }
 
-    public synchronized void fifo(int tag, int physPageNumber) {
+    public void fifo(int tag, int physPageNumber) {
         queue.add(tag);
         add(tag, physPageNumber);
         int toRemove = queue.remove();
         remove(toRemove);
     }
 
-    public void add(int tag, int RAMPageNumber){
+    public synchronized void add(int tag, int RAMPageNumber){
         while (map.size() == n){
             try {
                 wait();
@@ -29,7 +29,7 @@ public class TLB {
         map.put(tag, RAMPageNumber);
     }
 
-    public void remove(int tag){
+    public synchronized void remove(int tag){
         while (map.size() == 0){
             try {
                 wait();

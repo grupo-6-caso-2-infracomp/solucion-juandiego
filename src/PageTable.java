@@ -36,8 +36,8 @@ public class PageTable {
     }
 
     public synchronized int getOldestIndex(){
-        Integer min = Integer.MAX_VALUE;
-        Integer index = -1000;
+        int min = Integer.MAX_VALUE;
+        int index = -1000;
         for (int i:
              rBits) {
             if (i < min){
@@ -47,5 +47,4 @@ public class PageTable {
         }
         return index;
     }
-
 }

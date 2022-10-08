@@ -10,10 +10,10 @@ public class App {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Number of TLB entries");
-        Integer nTLB = scanner.nextInt();
+        int nTLB = scanner.nextInt();
 
         System.out.println("Number of page frames in RAM");
-        Integer nPF = scanner.nextInt();
+        int nPF = scanner.nextInt();
 
         Scanner scanner2 = new Scanner(System.in);
         System.out.println("Name of the references file");
@@ -35,16 +35,18 @@ public class App {
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String s;
-            int tag = Integer.parseInt(s);
             while ((s=br.readLine())!= null){
+                int tag = Integer.parseInt(s);
                 tags.add(tag);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
-        ReferenceUpdate r = new ReferenceUpdate(tag, tlb, pageTable, translationCount, loadCount);
-        //TODO fix the updates of the counters, execute a thread every two milliseconds
-        r.start();
+
+
+        //TODO How can I implement the whole "executes every __ milliseconds"?
+        //ReferenceUpdate r = new ReferenceUpdate(tag, tlb, pageTable, translationCount, loadCount);
+        //r.start();
+
     }
 }
