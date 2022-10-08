@@ -19,26 +19,11 @@ public class TLB {
     }
 
     public synchronized void add(int tag, int RAMPageNumber){
-        while (map.size() == n){
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
         map.put(tag, RAMPageNumber);
     }
 
     public synchronized void remove(int tag){
-        while (map.size() == 0){
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
         map.remove(tag);
-        notify();
     }
 
     public synchronized int lookForTagValue(int tag){

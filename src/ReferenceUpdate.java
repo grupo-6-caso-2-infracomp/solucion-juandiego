@@ -3,8 +3,8 @@ public class ReferenceUpdate extends Thread{
     private int virtualPageNumber;
     private TLB tlb;
     private PageTable pageTable;
-    public int translationCount;
-    public int loadCount;
+    private int translationCount = 0;
+    private int loadCount = 0;
 
     //get from TLB
     //cases:
@@ -14,12 +14,11 @@ public class ReferenceUpdate extends Thread{
 
     //this thread executes every two milliseconds
 
-    public ReferenceUpdate(int virtualPageNumber, TLB tlb, PageTable pageTable, int translationCount, int loadCount) {
+    public ReferenceUpdate(int virtualPageNumber, TLB tlb, PageTable pageTable) {
+        System.out.println("tries");
         this.virtualPageNumber = virtualPageNumber;
         this.tlb = tlb;
         this.pageTable = pageTable;
-        this.translationCount = translationCount;
-        this.loadCount = loadCount;
     }
 
     public void pageFault(int virtualPageNumber){
@@ -33,6 +32,13 @@ public class ReferenceUpdate extends Thread{
 
     }
 
+    public int getLoadCount() {
+        return loadCount;
+    }
+
+    public int getTranslationCount() {
+        return translationCount;
+    }
 
     @Override
     public void run() {

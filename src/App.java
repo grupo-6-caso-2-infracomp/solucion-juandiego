@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class App {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
         // Inputs
 
@@ -22,15 +22,9 @@ public class App {
         // Execution
 
         TLB tlb = new TLB(nTLB);
-
         PageTable pageTable = new PageTable(nPF);
-
         File file = new File(fileName);
-
         ArrayList<Integer> tags = new ArrayList<>();
-
-        int translationCount = 0;
-        int loadCount = 0;
 
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
@@ -43,10 +37,38 @@ public class App {
             e.printStackTrace();
         }
 
+        boolean running = true;
 
-        //TODO How can I implement the whole "executes every __ milliseconds"?
-        //ReferenceUpdate r = new ReferenceUpdate(tag, tlb, pageTable, translationCount, loadCount);
-        //r.start();
+        long time = System.currentTimeMillis();
+
+        int translationCount = 0;
+        int loadCount = 0;
+
+        while (running){
+            long elapsed = System.currentTimeMillis();
+            if (elapsed-time == 2){
+                try {
+                    int virtualPageNumber = tags.remove(0);
+                    ReferenceUpdate r = new ReferenceUpdate(virtualPageNumber, tlb, pageTable);
+                    r.start();
+                    r.join();
+                    loadCount += r.getLoadCount();
+                    translationCount += r.getTranslationCount();
+                }
+                catch (IndexOutOfBoundsException e) {
+                    running = false;
+                }
+
+            }
+            if (elapsed-time == 1){
+                Aging aging = new Aging(pageTable);
+                aging.start();
+                aging.join();
+            }
+        }
+
+        System.out.println(loadCount);
+        System.out.println(translationCount);
 
     }
 }
