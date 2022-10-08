@@ -44,27 +44,23 @@ public class App {
         int translationCount = 0;
         int loadCount = 0;
 
-        while (running){
-            long elapsed = System.currentTimeMillis();
-            if (elapsed-time == 2){
-                try {
-                    int virtualPageNumber = tags.remove(0);
-                    ReferenceUpdate r = new ReferenceUpdate(virtualPageNumber, tlb, pageTable);
-                    r.start();
-                    r.join();
-                    loadCount += r.getLoadCount();
-                    translationCount += r.getTranslationCount();
-                }
-                catch (IndexOutOfBoundsException e) {
-                    running = false;
-                }
+        ArrayList<ReferenceUpdate> referenceUpdates = new ArrayList<>();
 
-            }
-            if (elapsed-time == 1){
-                Aging aging = new Aging(pageTable);
-                aging.start();
-                aging.join();
-            }
+        for (int tag: tags) {
+            referenceUpdates.add(new ReferenceUpdate(tag, tlb, pageTable));
+        }
+
+        Aging aging = new Aging(pageTable);
+
+        for (ReferenceUpdate r:
+             referenceUpdates) {
+            Thread.sleep(1);
+            aging.run();
+            Thread.sleep(1);
+            r.run();
+            r.join();
+            loadCount += r.getLoadCount();
+            translationCount += r.getTranslationCount();
         }
 
         System.out.println(loadCount);

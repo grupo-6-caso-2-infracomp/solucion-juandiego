@@ -15,7 +15,6 @@ public class ReferenceUpdate extends Thread{
     //this thread executes every two milliseconds
 
     public ReferenceUpdate(int virtualPageNumber, TLB tlb, PageTable pageTable) {
-        System.out.println("tries");
         this.virtualPageNumber = virtualPageNumber;
         this.tlb = tlb;
         this.pageTable = pageTable;
