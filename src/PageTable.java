@@ -2,8 +2,8 @@ import java.util.ArrayList;
 
 public class PageTable {
 
-    private static final ArrayList<Integer> pageTableList = new ArrayList<>(64); // where to find each page in RAM. If not present, returns -1
-    private static final ArrayList<Integer> rBits = new ArrayList<>(64);
+    private ArrayList<Integer> pageTableList = new ArrayList<>(64); // where to find each page in RAM. If not present, returns -1
+    private ArrayList<Integer> rBits = new ArrayList<>(64);
 
     //aging algorithm should modify here, it's for solving page faults
     public PageTable(int pageFrames) {
@@ -18,12 +18,13 @@ public class PageTable {
         }
     }
 
-    public synchronized Integer getFromPageTableList(int index){
-        return pageTableList.get(index);
+    public synchronized Integer getFromPageTableList(int virtualPageNumber){
+        return pageTableList.get(virtualPageNumber);
     }
 
     public synchronized void updatePageTableListItem(int index, int newReference){
         pageTableList.set(index, newReference);
+        rBits.set(index,0);
     }
 
     public synchronized void shiftRBits(){
@@ -32,6 +33,19 @@ public class PageTable {
 
     public synchronized void updateRBit(int index){
         rBits.set(index, rBits.get(index)+0b10000000);
+    }
+
+    public synchronized int getOldestIndex(){
+        Integer min = Integer.MAX_VALUE;
+        Integer index = -1000;
+        for (int i:
+             rBits) {
+            if (i < min){
+                min = i;
+                index = i;
+            }
+        }
+        return index;
     }
 
 }

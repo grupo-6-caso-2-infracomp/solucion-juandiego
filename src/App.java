@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class App {
@@ -16,27 +17,34 @@ public class App {
 
         Scanner scanner2 = new Scanner(System.in);
         System.out.println("Name of the references file");
-        String fileName = scanner2.nextLine(); // the reference file asks for the determined page
-
+        String fileName = scanner2.nextLine(); // the reference file asks for a determined page
 
         // Execution
 
         TLB tlb = new TLB(nTLB);
 
-        RAM ram = new RAM(nPF);
-
         PageTable pageTable = new PageTable(nPF);
 
         File file = new File(fileName);
+
+        ArrayList<Integer> tags = new ArrayList<>();
+
+        int translationCount = 0;
+        int loadCount = 0;
+
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String s;
+            int tag = Integer.parseInt(s);
             while ((s=br.readLine())!= null){
-                int tag = Integer.parseInt(s);
-                ReferenceUpdate r = new ReferenceUpdate();
+                tags.add(tag);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        
+        ReferenceUpdate r = new ReferenceUpdate(tag, tlb, pageTable, translationCount, loadCount);
+        //TODO fix the updates of the counters, execute a thread every two milliseconds
+        r.start();
     }
 }
