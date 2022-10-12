@@ -37,10 +37,6 @@ public class App {
             e.printStackTrace();
         }
 
-        boolean running = true;
-
-        long time = System.currentTimeMillis();
-
         int translationCount = 0;
         int loadCount = 0;
 
@@ -49,22 +45,27 @@ public class App {
         for (int tag: tags) {
             referenceUpdates.add(new ReferenceUpdate(tag, tlb, pageTable));
         }
+        
+        ArrayList<Aging> agings = new ArrayList<>();
 
-        Aging aging = new Aging(pageTable);
+        for (int i = 0; i < 2048; i++) {
+            agings.add(new Aging(pageTable));
+        }
 
         for (ReferenceUpdate r:
              referenceUpdates) {
-            Thread.sleep(1);
-            aging.run();
-            Thread.sleep(1);
-            r.run();
+            agings.remove(0).start();
+            Thread.sleep(1000);
+            agings.remove(0).start();
+            Thread.sleep(1000);
+            r.start();
             r.join();
             loadCount += r.getLoadCount();
             translationCount += r.getTranslationCount();
+            Thread.sleep(1000);
         }
 
         System.out.println(loadCount);
         System.out.println(translationCount);
-
     }
 }

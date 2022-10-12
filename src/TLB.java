@@ -14,8 +14,9 @@ public class TLB {
     public void fifo(int tag, int physPageNumber) {
         queue.add(tag);
         add(tag, physPageNumber);
-        int toRemove = queue.remove();
+        int toRemove = queue.remove(); //TODO lo estoy removiendo de una vez!!
         remove(toRemove);
+        System.out.println(map.toString());
     }
 
     public synchronized void add(int tag, int RAMPageNumber){

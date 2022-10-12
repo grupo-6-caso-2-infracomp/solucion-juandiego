@@ -41,23 +41,27 @@ public class ReferenceUpdate extends Thread{
 
     @Override
     public void run() {
-        pageTable.updateRBit(virtualPageNumber);
-        // looks on the tlb
+        pageTable.updateReference(virtualPageNumber);
         int physPageNumber = tlb.lookForTagValue(virtualPageNumber);
         if (physPageNumber != -1 && physPageNumber != -2){
             translationCount += 2; // go to the tlb and translate from there.
             loadCount += 30; // get the page from RAM
+            System.out.println("got from tlb page " + virtualPageNumber);
         } else if (physPageNumber == -1) {
             pageFault(virtualPageNumber);
+            System.out.println("page fault from tlb on page " + virtualPageNumber);
         } else { // looks on the page table
             physPageNumber = pageTable.getFromPageTableList(virtualPageNumber);
             tlb.fifo(virtualPageNumber,physPageNumber);
+            System.out.println("adds to tlb page " + virtualPageNumber);
             if (physPageNumber == -1){
                 pageFault(virtualPageNumber);
+                System.out.println("page fault from pagetable on page " + virtualPageNumber);
             }
             else {
                 translationCount += 30;
                 loadCount += 30;
+                System.out.println("got it from pagetable");
             }
         }
     }
