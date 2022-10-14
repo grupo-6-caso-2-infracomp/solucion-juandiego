@@ -2,7 +2,7 @@ public class ReferenceUpdate extends Thread{
 
     private int virtualPageNumber;
     private TLB tlb;
-    private RAM RAM;
+    private RAM ram;
     private int translationCount = 0;
     private int loadCount = 0;
 
@@ -14,22 +14,22 @@ public class ReferenceUpdate extends Thread{
 
     //this thread executes every two milliseconds
 
-    public ReferenceUpdate(int virtualPageNumber, TLB tlb, RAM RAM) {
+    public ReferenceUpdate(int virtualPageNumber, TLB tlb, RAM ram) {
         this.virtualPageNumber = virtualPageNumber;
         this.tlb = tlb;
-        this.RAM = RAM;
+        this.ram = ram;
     }
 
     public void pageFault(int virtualPageNumber){
         // read the page table twice
         // look for the references table on the page table
-        // choose a reference to kick out to disk and place my page there, BASED ON REFERENCES
+        // choose a reference to kick out to disk and place my page there
         loadCount += 60;
         translationCount += 60;
-        int kick = RAM.getOldestIndex();
-        RAM.updatePageTableListItem(virtualPageNumber, kick);
-        System.err.println("Fault is on virtual page " + virtualPageNumber);
-        tlb.updateTLBItem(kick, virtualPageNumber);
+        int kick = ram.getOldestIndex();
+        ram.updatePageTableListItem(virtualPageNumber, kick);
+        tlb.removeFromTLB(virtualPageNumber);
+        System.err.println("Page fault retrieving virtual page " + virtualPageNumber);
     }
 
     public int getLoadCount() {
@@ -42,29 +42,28 @@ public class ReferenceUpdate extends Thread{
 
     @Override
     public void run() {
+        System.out.println("--------------------------");
+        System.out.println("Gets virtual page: " + virtualPageNumber);
+        System.out.println("PageTable: " + ram.getPageTableList());
         int physPageNumber = tlb.lookForTagValue(virtualPageNumber);
-        if (physPageNumber >= 0) RAM.updateReference(physPageNumber);
         if (physPageNumber != -1 && physPageNumber != -2){
+            // está en la TLB y en RAM
             translationCount += 2; // go to the tlb and translate from there.
             loadCount += 30; // get the page from RAM
-        } else if (physPageNumber == -1) {
-            pageFault(virtualPageNumber);
         } else { // looks on the page table
-            physPageNumber = RAM.getFromPageTableList(virtualPageNumber);
-            tlb.fifo(virtualPageNumber,physPageNumber);
+            physPageNumber = ram.getFromPageTableList(virtualPageNumber);
             if (physPageNumber == -1){
                 pageFault(virtualPageNumber);
+                int realPageNumber = 0;
+                realPageNumber = ram.getFromPageTableList(virtualPageNumber);
+                tlb.fifo(virtualPageNumber, realPageNumber);
             }
             else {
                 translationCount += 30;
                 loadCount += 30;
+                ram.updateReference(physPageNumber);
+                tlb.fifo(virtualPageNumber,physPageNumber);
             }
         }
-        System.out.println("--------------------------------------");
-        System.out.println("VirtualPageNumber: " + virtualPageNumber);
-        System.out.println("PageTable: " + RAM.getPageTableList());
-        System.out.println("TLB: " + tlb.getMap());
-        System.out.println("RBits: " + RAM.getrBits());
-
     }
 }

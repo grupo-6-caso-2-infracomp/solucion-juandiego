@@ -13,22 +13,15 @@ public class TLB {
 
     public void fifo(int tag, int physPageNumber) {
         queue.add(tag);
-        add(tag, physPageNumber);
+        map.put(tag, physPageNumber);
         if (map.size() >= n+1) {
             int toRemove = queue.remove();
-            remove(toRemove);
+            map.remove(toRemove);
         }
     }
 
-    public synchronized void add(int tag, int RAMPageNumber){
-        map.put(tag, RAMPageNumber);
-    }
-
-    public synchronized void remove(int tag){
-        map.remove(tag);
-    }
-
-    public synchronized int lookForTagValue(int tag){
+    public int lookForTagValue(int tag){
+        System.out.println("TLB: " + map);
         // looks for the index of the reference searched.
         for (int t:
              map.keySet()) {
@@ -41,7 +34,10 @@ public class TLB {
         return map;
     }
 
-    public void updateTLBItem(int kick, int virtualPageNumber) {
-        map.put(virtualPageNumber, kick);
+    public void removeFromTLB (int tag) {
+        if (map.contains(tag)) {
+            map.remove(tag);
+            queue.remove(Integer.valueOf(tag));
+        }
     }
 }

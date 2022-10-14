@@ -6,19 +6,17 @@ public class RAM {
     private ArrayList<Long> rBits = new ArrayList<>(); //is a part of the RAM
     private ArrayList<Integer> references = new ArrayList<>(); //is a part of the RAM
 
+    private int pageFrames;
 
 
     public RAM(int pageFrames, int numberOfPages) {
-        for (int i = 0; i < numberOfPages - 1; i++) { 
+        this.pageFrames = pageFrames;
+        for (int i = 0; i < numberOfPages - 1; i++) {
+            pageTableList.add(-1);
             if (i < pageFrames){
-                pageTableList.add(i);
                 rBits.add(0L);
                 references.add(0);
             }
-            else {
-                pageTableList.add(-1); // page fault
-            }
-            //System.out.println("Page Table: " + pageTableList.toString());
         }
     }
 
@@ -28,14 +26,24 @@ public class RAM {
 
     public synchronized void updatePageTableListItem(int newVirtualPageNumber, int oldVirtualPageNumber){
         //le pongo el numero de pagina real al otro indice
-        int realPageNumber = pageTableList.get(oldVirtualPageNumber);
-        pageTableList.set(newVirtualPageNumber, realPageNumber);
-        pageTableList.set(oldVirtualPageNumber, -1);
+        int countDifferent = 0;
+        for (int i:
+             pageTableList) {
+            if (i != -1) countDifferent ++;
+        }
+
+        if (countDifferent == pageFrames) {
+            int realPageNumber = pageTableList.get(oldVirtualPageNumber);
+            pageTableList.set(newVirtualPageNumber, realPageNumber);
+            pageTableList.set(oldVirtualPageNumber, -1);
+        }
+        else {
+            pageTableList.set(newVirtualPageNumber, countDifferent);
+        }
     }
 
     public synchronized void shiftRBits(){
         rBits.replaceAll(integer -> integer >> 1);
-        references.replaceAll(i -> i*0);
     }
 
     public synchronized void updateRBit(int index){
@@ -52,8 +60,6 @@ public class RAM {
                 index = i;
             }
         }
-        System.err.println("Page fault!");
-        System.err.println("Index to kick: " + index);
         return index;
     }
 
@@ -70,5 +76,9 @@ public class RAM {
 
     public synchronized ArrayList<Integer> getPageTableList() {
         return pageTableList;
+    }
+
+    public synchronized void clearReferences(){
+        references.replaceAll(i -> 0);
     }
 }
