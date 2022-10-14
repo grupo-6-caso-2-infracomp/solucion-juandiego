@@ -14,9 +14,10 @@ public class TLB {
     public void fifo(int tag, int physPageNumber) {
         queue.add(tag);
         add(tag, physPageNumber);
-        int toRemove = queue.remove(); //TODO lo estoy removiendo de una vez!!
-        remove(toRemove);
-        System.out.println(map.toString());
+        if (map.size() >= n+1) {
+            int toRemove = queue.remove();
+            remove(toRemove);
+        }
     }
 
     public synchronized void add(int tag, int RAMPageNumber){
@@ -34,5 +35,13 @@ public class TLB {
             if (t == tag) return map.get(t);
         }
         return -2; //it's not in the TLB
+    }
+
+    public Hashtable<Integer, Integer> getMap() {
+        return map;
+    }
+
+    public void updateTLBItem(int kick, int virtualPageNumber) {
+        map.put(virtualPageNumber, kick);
     }
 }

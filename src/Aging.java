@@ -2,28 +2,32 @@ import java.util.ArrayList;
 
 public class Aging extends Thread{
 
-    private PageTable pageTable;
+    private RAM RAM;
 
-    public Aging(PageTable pageTable) {
-        this.pageTable = pageTable;
+    public Aging(RAM RAM) {
+        this.RAM = RAM;
     }
     
-    public void updateRBit(PageTable pageTable){
-        ArrayList<Integer> references = pageTable.getReferences();
+    public void updateRBit(RAM RAM){
+//        System.out.println("-----------------------");
+//        System.out.println("PageTable: " + RAM.getPageTableList());
+        ArrayList<Integer> references = RAM.getReferences();
+//        System.out.println("References: " + RAM.getReferences());
         for (int i = 0; i < references.size(); i++) {
             if (references.get(i) == 1) {
-                pageTable.updateRBit(i);
+                RAM.updateRBit(i);
             }
         }
+//        System.out.println("RBits: " + RAM.getrBits());
     }
     
-    public void agingAlgorithm (PageTable pageTable){
-        pageTable.shiftRBits();
+    public void agingAlgorithm (RAM RAM){
+        RAM.shiftRBits();
     }
 
     @Override
     public void run() {
-        updateRBit(pageTable);
-        agingAlgorithm(pageTable);
+        updateRBit(RAM);
+        agingAlgorithm(RAM);
     }
 }

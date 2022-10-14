@@ -17,13 +17,13 @@ public class App {
 
         Scanner scanner2 = new Scanner(System.in);
         System.out.println("Name of the references file");
-        String fileName = scanner2.nextLine(); // the reference file asks for a determined page
+        String fileName = scanner2.nextLine(); // the reference file asks for a determined virtual page
 
         // Execution
 
         TLB tlb = new TLB(nTLB);
-        PageTable pageTable = new PageTable(nPF);
         File file = new File(fileName);
+        RAM ram = new RAM(nPF,8);
         ArrayList<Integer> tags = new ArrayList<>();
 
         try {
@@ -43,29 +43,28 @@ public class App {
         ArrayList<ReferenceUpdate> referenceUpdates = new ArrayList<>();
 
         for (int tag: tags) {
-            referenceUpdates.add(new ReferenceUpdate(tag, tlb, pageTable));
+            referenceUpdates.add(new ReferenceUpdate(tag, tlb, ram));
         }
         
         ArrayList<Aging> agings = new ArrayList<>();
 
         for (int i = 0; i < 2048; i++) {
-            agings.add(new Aging(pageTable));
+            agings.add(new Aging(ram));
         }
 
         for (ReferenceUpdate r:
              referenceUpdates) {
             agings.remove(0).start();
-            Thread.sleep(1000);
+            Thread.sleep(100);
             agings.remove(0).start();
-            Thread.sleep(1000);
             r.start();
             r.join();
             loadCount += r.getLoadCount();
             translationCount += r.getTranslationCount();
-            Thread.sleep(1000);
+            Thread.sleep(100);
         }
 
-        System.out.println(loadCount);
-        System.out.println(translationCount);
+        System.out.println("Load time: " + loadCount);
+        System.out.println("Translation time: " + translationCount);
     }
 }

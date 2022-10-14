@@ -2,7 +2,7 @@ public class ReferenceUpdate extends Thread{
 
     private int virtualPageNumber;
     private TLB tlb;
-    private PageTable pageTable;
+    private RAM RAM;
     private int translationCount = 0;
     private int loadCount = 0;
 
@@ -14,10 +14,10 @@ public class ReferenceUpdate extends Thread{
 
     //this thread executes every two milliseconds
 
-    public ReferenceUpdate(int virtualPageNumber, TLB tlb, PageTable pageTable) {
+    public ReferenceUpdate(int virtualPageNumber, TLB tlb, RAM RAM) {
         this.virtualPageNumber = virtualPageNumber;
         this.tlb = tlb;
-        this.pageTable = pageTable;
+        this.RAM = RAM;
     }
 
     public void pageFault(int virtualPageNumber){
@@ -26,9 +26,10 @@ public class ReferenceUpdate extends Thread{
         // choose a reference to kick out to disk and place my page there, BASED ON REFERENCES
         loadCount += 60;
         translationCount += 60;
-        int kick = pageTable.getOldestIndex();
-        pageTable.updatePageTableListItem(kick, virtualPageNumber);
-
+        int kick = RAM.getOldestIndex();
+        RAM.updatePageTableListItem(virtualPageNumber, kick);
+        System.err.println("Fault is on virtual page " + virtualPageNumber);
+        tlb.updateTLBItem(kick, virtualPageNumber);
     }
 
     public int getLoadCount() {
@@ -41,28 +42,29 @@ public class ReferenceUpdate extends Thread{
 
     @Override
     public void run() {
-        pageTable.updateReference(virtualPageNumber);
         int physPageNumber = tlb.lookForTagValue(virtualPageNumber);
+        if (physPageNumber >= 0) RAM.updateReference(physPageNumber);
         if (physPageNumber != -1 && physPageNumber != -2){
             translationCount += 2; // go to the tlb and translate from there.
             loadCount += 30; // get the page from RAM
-            System.out.println("got from tlb page " + virtualPageNumber);
         } else if (physPageNumber == -1) {
             pageFault(virtualPageNumber);
-            System.out.println("page fault from tlb on page " + virtualPageNumber);
         } else { // looks on the page table
-            physPageNumber = pageTable.getFromPageTableList(virtualPageNumber);
+            physPageNumber = RAM.getFromPageTableList(virtualPageNumber);
             tlb.fifo(virtualPageNumber,physPageNumber);
-            System.out.println("adds to tlb page " + virtualPageNumber);
             if (physPageNumber == -1){
                 pageFault(virtualPageNumber);
-                System.out.println("page fault from pagetable on page " + virtualPageNumber);
             }
             else {
                 translationCount += 30;
                 loadCount += 30;
-                System.out.println("got it from pagetable");
             }
         }
+        System.out.println("--------------------------------------");
+        System.out.println("VirtualPageNumber: " + virtualPageNumber);
+        System.out.println("PageTable: " + RAM.getPageTableList());
+        System.out.println("TLB: " + tlb.getMap());
+        System.out.println("RBits: " + RAM.getrBits());
+
     }
 }
