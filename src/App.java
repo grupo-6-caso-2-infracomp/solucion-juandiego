@@ -18,13 +18,13 @@ public class App {
         int nPF = scanner.nextInt();
 
         Scanner scanner2 = new Scanner(System.in);
-        System.out.println("Name of the references file");
+        System.out.println("Name of the references file (inside the references folder)");
         String fileName = scanner2.nextLine(); // the reference file asks for a determined virtual page
 
         // Execution
 
         TLB tlb = new TLB(nTLB);
-        File file = new File(fileName);
+        File file = new File("references/" + fileName);
         RAM ram = new RAM(nPF,NUM_PAGES);
         ArrayList<Integer> tags = new ArrayList<>();
 
