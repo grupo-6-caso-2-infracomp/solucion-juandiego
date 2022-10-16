@@ -12,16 +12,21 @@ public class TLB {
     }
 
     public void fifo(int tag, int physPageNumber) {
+        //System.out.println("Queue before: " + queue);
+        //System.out.println("TLB before: " + map);
         queue.add(tag);
         map.put(tag, physPageNumber);
-        if (map.size() >= n+1) {
+        if (map.size() == n+1) {
             int toRemove = queue.remove();
+//            System.out.println("Removed " +  toRemove + " from the TLB");
             map.remove(toRemove);
         }
+//        System.out.println("Queue after: " + queue);
+//        System.out.println("TLB after: " + map);
     }
 
     public int lookForTagValue(int tag){
-        System.out.println("TLB: " + map);
+//        System.out.println("TLB: " + map);
         // looks for the index of the reference searched.
         for (int t:
              map.keySet()) {

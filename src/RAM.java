@@ -11,7 +11,7 @@ public class RAM {
 
     public RAM(int pageFrames, int numberOfPages) {
         this.pageFrames = pageFrames;
-        for (int i = 0; i < numberOfPages - 1; i++) {
+        for (int i = 0; i < numberOfPages ; i++) {
             pageTableList.add(-1);
             if (i < pageFrames){
                 rBits.add(0L);
@@ -21,10 +21,14 @@ public class RAM {
     }
 
     public synchronized Integer getFromPageTableList(int virtualPageNumber){
-        return pageTableList.get(virtualPageNumber);
+        int realPageNumber =  pageTableList.get(virtualPageNumber);
+        if (realPageNumber >= 0){
+            updateReference(realPageNumber);
+        }
+        return realPageNumber;
     }
 
-    public synchronized void updatePageTableListItem(int newVirtualPageNumber, int oldVirtualPageNumber){
+    public synchronized void updatePageTableListItem(int newVirtualPageNumber, int realPageNumber){
         //le pongo el numero de pagina real al otro indice
         int countDifferent = 0;
         for (int i:
@@ -33,11 +37,21 @@ public class RAM {
         }
 
         if (countDifferent == pageFrames) {
-            int realPageNumber = pageTableList.get(oldVirtualPageNumber);
+            //System.err.println("Case complete RAM");
+            int oldVirtualPageNumber = -1000;
+            for (int virtualPageNumber = 0; virtualPageNumber < pageTableList.size(); virtualPageNumber++) {
+                if (pageTableList.get(virtualPageNumber) == realPageNumber){
+                    oldVirtualPageNumber = virtualPageNumber;
+                }
+            }
+            //System.err.println("Sets " + newVirtualPageNumber + " to " + realPageNumber);
             pageTableList.set(newVirtualPageNumber, realPageNumber);
+            //System.err.println("Sets " + oldVirtualPageNumber + " to " + "-1");
             pageTableList.set(oldVirtualPageNumber, -1);
         }
         else {
+            //System.err.println("Case incomplete RAM");
+            //System.err.println("Sets " + newVirtualPageNumber + " to " + countDifferent);
             pageTableList.set(newVirtualPageNumber, countDifferent);
         }
     }
@@ -52,14 +66,16 @@ public class RAM {
 
 
     public synchronized int getOldestIndex(){
+        //System.out.println("RBits: " + rBits );
         long min = Long.MAX_VALUE;
         int index = -100;
         for (int i = 0; i < rBits.size(); i++) {
-            if (i < min){
+            if (rBits.get(i) < min){
                 min = rBits.get(i);
                 index = i;
             }
         }
+        //System.out.println("Minimum: " + min);
         return index;
     }
 
