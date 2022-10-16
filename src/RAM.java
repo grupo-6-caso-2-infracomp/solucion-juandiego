@@ -28,7 +28,7 @@ public class RAM {
         return realPageNumber;
     }
 
-    public synchronized void updatePageTableListItem(int newVirtualPageNumber, int realPageNumber){
+    public synchronized int updatePageTableListItem(int newVirtualPageNumber, int realPageNumber){
         //le pongo el numero de pagina real al otro indice
         int countDifferent = 0;
         for (int i:
@@ -48,12 +48,15 @@ public class RAM {
             pageTableList.set(newVirtualPageNumber, realPageNumber);
             //System.err.println("Sets " + oldVirtualPageNumber + " to " + "-1");
             pageTableList.set(oldVirtualPageNumber, -1);
+            return oldVirtualPageNumber;
         }
         else {
             //System.err.println("Case incomplete RAM");
             //System.err.println("Sets " + newVirtualPageNumber + " to " + countDifferent);
             pageTableList.set(newVirtualPageNumber, countDifferent);
         }
+
+        return -2;
     }
 
     public synchronized void shiftRBits(){

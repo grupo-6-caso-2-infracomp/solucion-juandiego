@@ -40,9 +40,12 @@ public class TLB {
     }
 
     public void removeFromTLB (int tag) {
-        if (map.contains(tag)) {
+        //System.err.println("TLB before: " + map);
+        //System.err.println(map.contains(tag));
+        if (map.containsKey(tag)) {
             map.remove(tag);
             queue.remove(Integer.valueOf(tag));
         }
+        //System.err.println("TLB after: " + map);
     }
 }

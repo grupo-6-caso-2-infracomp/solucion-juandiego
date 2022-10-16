@@ -13,11 +13,15 @@ public class ReferenceUpdate extends Thread{
     }
 
     public void pageFault(int virtualPageNumber){
+        System.err.println("page fault");
         translationCount += 60; // read the page table twice
         loadCount += 10000000;
         int kick = ram.getOldestIndex();
-        ram.updatePageTableListItem(virtualPageNumber, kick);
-        tlb.removeFromTLB(virtualPageNumber);
+        int old = ram.updatePageTableListItem(virtualPageNumber, kick);
+        if (old != -2){
+            tlb.removeFromTLB(old);
+        }
+
     }
 
     public long getLoadCount() {

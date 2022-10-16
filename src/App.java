@@ -23,7 +23,7 @@ public class App {
 
         TLB tlb = new TLB(nTLB);
         File file = new File(fileName);
-        RAM ram = new RAM(nPF,64);
+        RAM ram = new RAM(nPF,8);
         ArrayList<Integer> tags = new ArrayList<>();
 
         try {
@@ -55,13 +55,13 @@ public class App {
         for (ReferenceUpdate r:
              referenceUpdates) {
             agings.remove(0).start();
-            Thread.sleep(1);
+            Thread.sleep(100);
             agings.remove(0).start();
             r.start();
             r.join();
             loadCount += r.getLoadCount();
             translationCount += r.getTranslationCount();
-            Thread.sleep(1);
+            Thread.sleep(100);
         }
 
         System.out.println("Load time: " + loadCount);
