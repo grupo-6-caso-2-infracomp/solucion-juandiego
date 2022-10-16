@@ -1,14 +1,42 @@
 import java.util.ArrayList;
+import java.util.Collections;
 
+
+/**
+ * Class that emulates a RAM and all of its processes.
+ * It also contains the pageTable, but in reality it's not located here.
+ */
 public class RAM {
+    /**
+     * This list represents the page table. Each index of the list is the virtual
+     * page number and the value is the real page number. If said virtual page number
+     * is not present in RAM, the value is -1
+     */
+    private final ArrayList<Integer> pageTableList = new ArrayList<>();
 
-    private ArrayList<Integer> pageTableList = new ArrayList<>(); // where to find each page in RAM. If not present, returns -1
-    private ArrayList<Long> rBits = new ArrayList<>(); //is a part of the RAM
-    private ArrayList<Integer> references = new ArrayList<>(); //is a part of the RAM
+    /**
+     * This list has the rBit of each real page number in RAM. Works with the aging
+     * algorithm.
+     */
+    private final ArrayList<Long> rBits = new ArrayList<>();
 
-    private int pageFrames;
+    /**
+     * This list has the reference of each real page in a certain instant. Works with
+     * the aging algorithm.
+     */
+    private final ArrayList<Integer> references = new ArrayList<>();
+
+    /**
+     * Number of page frames in RAM determined by the user.
+     */
+    private final int pageFrames;
 
 
+    /**
+     * @param pageFrames Number of page frames in RAM determined by the user.
+     * @param numberOfPages Amount of pages designated for the imaginary
+     *                      program
+     */
     public RAM(int pageFrames, int numberOfPages) {
         this.pageFrames = pageFrames;
         for (int i = 0; i < numberOfPages ; i++) {
@@ -20,6 +48,12 @@ public class RAM {
         }
     }
 
+    /**
+     * Returns the real page number from the virtual page number
+     * and updates the reference of said real page number
+     * @param virtualPageNumber
+     * @return Real page number
+     */
     public synchronized Integer getFromPageTableList(int virtualPageNumber){
         int realPageNumber =  pageTableList.get(virtualPageNumber);
         if (realPageNumber >= 0){
@@ -28,8 +62,17 @@ public class RAM {
         return realPageNumber;
     }
 
+    /**
+     * Updates a virtual page number.
+     * It has two possible cases. A case in which the RAM is not full and where it is full.
+     * If it's not full, it adds the next integer available of space
+     * If it is full, it has to kick another.
+     * @param newVirtualPageNumber The virtual page number who is about to get a space in RAM
+     * @param realPageNumber The real page number to be given
+     * @return Old virtual page number from where it got the
+     * space. If this wasn't the case, it returns -2.
+     */
     public synchronized int updatePageTableListItem(int newVirtualPageNumber, int realPageNumber){
-        //le pongo el numero de pagina real al otro indice
         int countDifferent = 0;
         for (int i:
              pageTableList) {
@@ -37,39 +80,43 @@ public class RAM {
         }
 
         if (countDifferent == pageFrames) {
-            //System.err.println("Case complete RAM");
             int oldVirtualPageNumber = -1000;
             for (int virtualPageNumber = 0; virtualPageNumber < pageTableList.size(); virtualPageNumber++) {
                 if (pageTableList.get(virtualPageNumber) == realPageNumber){
                     oldVirtualPageNumber = virtualPageNumber;
                 }
             }
-            //System.err.println("Sets " + newVirtualPageNumber + " to " + realPageNumber);
             pageTableList.set(newVirtualPageNumber, realPageNumber);
-            //System.err.println("Sets " + oldVirtualPageNumber + " to " + "-1");
             pageTableList.set(oldVirtualPageNumber, -1);
             return oldVirtualPageNumber;
         }
         else {
-            //System.err.println("Case incomplete RAM");
-            //System.err.println("Sets " + newVirtualPageNumber + " to " + countDifferent);
             pageTableList.set(newVirtualPageNumber, countDifferent);
         }
-
         return -2;
     }
 
+    /**
+     * Adds a 0 the left most bit of each real page number.
+     */
     public synchronized void shiftRBits(){
         rBits.replaceAll(integer -> integer >> 1);
     }
 
+    /**
+     * Adds a 1 to the left most bit of given real page number.
+     * @param index Real page number referenced
+     */
     public synchronized void updateRBit(int index){
         rBits.set(index, rBits.get(index)+ (long) Integer.MAX_VALUE + 1);
     }
 
 
-    public synchronized int getOldestIndex(){
-        //System.out.println("RBits: " + rBits );
+    /**
+     * Returns the smallest index on the rBits array list
+     * @return Said smallest index
+     */
+    public synchronized int getSmallestIndex(){
         long min = Long.MAX_VALUE;
         int index = -100;
         for (int i = 0; i < rBits.size(); i++) {
@@ -78,26 +125,28 @@ public class RAM {
                 index = i;
             }
         }
-        //System.out.println("Minimum: " + min);
         return index;
     }
 
+    /**
+     * @return The references array list
+     */
     public synchronized ArrayList<Integer> getReferences() {
         return references;
     }
+
+    /**
+     * Updates the reference for a given real page number.
+     * @param index The real page number referenced
+     */
     public synchronized void updateReference(int index){
         references.set(index, 1);
     }
 
-    public synchronized ArrayList<Long> getrBits() {
-        return rBits;
-    }
-
-    public synchronized ArrayList<Integer> getPageTableList() {
-        return pageTableList;
-    }
-
+    /**
+     * Sets every reference to zero.
+     */
     public synchronized void clearReferences(){
-        references.replaceAll(i -> 0);
+        Collections.fill(references, 0);
     }
 }
