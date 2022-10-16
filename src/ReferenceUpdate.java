@@ -13,7 +13,7 @@ public class ReferenceUpdate extends Thread{
     }
 
     public void pageFault(int virtualPageNumber){
-        System.err.println("page fault");
+        //System.err.println("page fault");
         translationCount += 60; // read the page table twice
         loadCount += 10000000;
         int kick = ram.getOldestIndex();

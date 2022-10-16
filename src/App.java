@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class App {
+
+    public static final int NUM_PAGES = 64;
     public static void main(String[] args) throws InterruptedException {
 
         // Inputs
@@ -23,7 +25,7 @@ public class App {
 
         TLB tlb = new TLB(nTLB);
         File file = new File(fileName);
-        RAM ram = new RAM(nPF,8);
+        RAM ram = new RAM(nPF,NUM_PAGES);
         ArrayList<Integer> tags = new ArrayList<>();
 
         try {
@@ -48,20 +50,20 @@ public class App {
         
         ArrayList<Aging> agings = new ArrayList<>();
 
-        for (int i = 0; i < 2048; i++) {
+        for (int i = 0; i < tags.size() * 2; i++) {
             agings.add(new Aging(ram));
         }
 
         for (ReferenceUpdate r:
              referenceUpdates) {
             agings.remove(0).start();
-            Thread.sleep(100);
+            Thread.sleep(1);
             agings.remove(0).start();
             r.start();
             r.join();
             loadCount += r.getLoadCount();
             translationCount += r.getTranslationCount();
-            Thread.sleep(100);
+            Thread.sleep(1);
         }
 
         System.out.println("Load time: " + loadCount);
