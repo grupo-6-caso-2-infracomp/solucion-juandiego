@@ -58,7 +58,7 @@ public class TLB {
      * Removes a key value pair from given key
      * @param tag virtual page number to remove
      */
-    public void removeFromTLB (int tag) {
+    public void removeFromTLB(int tag) {
         if (map.containsKey(tag)) {
             map.remove(tag);
             queue.remove(Integer.valueOf(tag));

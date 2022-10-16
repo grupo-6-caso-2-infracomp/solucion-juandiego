@@ -38,7 +38,7 @@ public class ReferenceUpdate extends Thread {
      * Solves a page fault
      * @param virtualPageNumber Where the page fault occured
      */
-    public void pageFault(int virtualPageNumber){
+    private void pageFault(int virtualPageNumber){
         translationCount += 60; // read the page table twice
         loadCount += 10000000; // solves a page fault
         int kick = ram.getSmallestIndex(); // takes smallest rBit (from aging algorithm)
